@@ -1,6 +1,7 @@
 import { createUser } from "../services/auth.service.js";
-import { generateToken } from "../services/token.service.js";
+import { generateToken, verifyToken } from "../services/token.service.js";
 import { signUser } from "../services/auth.service.js";
+import { findUser } from "../services/user.service.js";
 
 const { ACCESS_TOKEN_SECRET, REFRESH_TOKEN_SECRET } = process.env;
 
@@ -97,6 +98,30 @@ export const postLogout = async (req, res, next) => {
 
 export const postRefreshToken = async (req, res, next) => {
   try {
+    const refresh_token = req.cookies.refreshtoken;
+
+    if (!refresh_token) throw createHttpError.Unauthorized("Please login.");
+
+    const check = await verifyToken(
+      refresh_token,
+      REFRESH_TOKEN_SECRET
+    );
+    const user = await findUser(check.userId);
+    const access_token = await generateToken(
+      { userId: user._id },
+      "1d",
+      ACCESS_TOKEN_SECRET
+    );
+    res.json({
+      user: {
+        _id: user._id,
+        name: user.name,
+        email: user.email,
+        picture: user.picture,
+        status: user.status,
+        token: access_token,
+      },
+    });
   } catch (error) {
     next(error);
   }
