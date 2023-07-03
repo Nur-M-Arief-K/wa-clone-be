@@ -1,6 +1,8 @@
 import mongoose from "mongoose";
 import validator from "validator";
 
+const { DEFAULT_USER_PICTURE_URL, DEFAULT_USER_STATUS } = process.env;
+
 const userSchema = mongoose.Schema(
   {
     name: {
@@ -16,12 +18,11 @@ const userSchema = mongoose.Schema(
     },
     picture: {
       type: String,
-      default:
-        "https://res.cloudinary.com/dkd5jblv5/image/upload/v1675976806/Default_ProfilePicture_gjngnb.png",
+      default: DEFAULT_USER_PICTURE_URL,
     },
     status: {
       type: String,
-      default: "Hey there! I am using whatsapp",
+      default: DEFAULT_USER_STATUS,
     },
     password: {
       type: String,
