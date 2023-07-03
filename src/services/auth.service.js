@@ -58,6 +58,8 @@ export const createUser = async (userData) => {
     );
   }
 
+  // hashing user password is done in user schema when its pre-saved
+  
   //adding user to databse
   const user = await new UserModel({
     name,

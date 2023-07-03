@@ -1,6 +1,6 @@
 import { createUser } from "../services/auth.service.js";
 
-export const register = async (req, res, next) => {
+export const postRegister = async (req, res, next) => {
     try {
         const { name, email, picture, status, password } = req.body;
         const newUser = await createUser({ name, email, picture, status, password });
@@ -10,7 +10,7 @@ export const register = async (req, res, next) => {
     }
 }
 
-export const login = async (req, res, next) => {
+export const postLogin = async (req, res, next) => {
     try {
         
     } catch (error) {
@@ -18,7 +18,7 @@ export const login = async (req, res, next) => {
     }
 }
 
-export const logout = async (req, res, next) => {
+export const postLogout = async (req, res, next) => {
     try {
         
     } catch (error) {
@@ -26,7 +26,7 @@ export const logout = async (req, res, next) => {
     }
 }
 
-export const refreshToken = async (req, res, next) => {
+export const postRefreshToken = async (req, res, next) => {
     try {
         
     } catch (error) {
