@@ -48,3 +48,13 @@ export const updateLatestMessage = async (conversation_id, msg) => {
 
   return updatedConversation;
 };
+
+export const getConversationMessages = async (conversation_id) => {
+  const messages = await MessageModel.find({
+    conversation: conversation_id,
+  }).populate({ path: "sender", select: "name picture email status" }).populate("conversation");
+  if(!messages) {
+    throw createHttpError.BadRequest("something went wrong")
+  }
+  return messages;
+};
