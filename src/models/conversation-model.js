@@ -1,11 +1,11 @@
 import mongoose from "mongoose";
-const { ObjectId } = mongoose.Schema.types;
+const { ObjectId } = mongoose.Schema.Types;
 
 const conversationSchema = mongoose.Schema(
   {
     name: {
       type: String,
-      required: [true, "conversation is requiresd"],
+      required: [true, "receiver name is requiresd"],
       trim: true,
     },
     isGroup: {
