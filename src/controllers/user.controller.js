@@ -9,7 +9,7 @@ export const getSearchUsers = async (req, res, next) => {
             logger.error("search term not found");
             throw createHttpError.BadRequest("search term not found");
         }
-        const users = await searchUsersService(keyword);
+        const users = await searchUsersService(keyword, req.user.userId);
 
         res.status(200).json(users);
     } catch (error) {
