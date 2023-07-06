@@ -14,13 +14,12 @@ export const postCreateOpenConversation = async (req, res, next) => {
         const conversationExist = await doesConversationExist(sender_id, receiver_id);
 
         if(conversationExist) {
-            console.log("conversation exist branch run")
             res.json(conversationExist);
         } else {
-            console.log("conversation NOT exist branch run")
             let receiver_user = await findUser(receiver_id);
             let conversationData = {
                 name: receiver_user.name,
+                picture: receiver_user.picture,
                 isGroup: false,
                 users: [sender_id, receiver_id]
             };
