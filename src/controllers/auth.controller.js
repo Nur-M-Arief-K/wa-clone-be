@@ -15,18 +15,18 @@ export const postRegister = async (req, res, next) => {
       status,
       password,
     });
-    const access_token = await generateToken(
+    const accessToken = await generateToken(
       { userId: newUser._id },
       "1d",
       ACCESS_TOKEN_SECRET
     );
-    const refresh_token = await generateToken(
+    const refreshToken = await generateToken(
       { userId: newUser._id },
       "30d",
       REFRESH_TOKEN_SECRET
     );
 
-    res.cookie("refreshtoken", refresh_token, {
+    res.cookie("refreshtoken", refreshToken, {
         httpOnly: true,
         path: "/api/v1/auth/refreshtoken",
         maxAge: 30 * 24 * 40 * 60 * 1000 // 30 days
@@ -40,7 +40,7 @@ export const postRegister = async (req, res, next) => {
           email: newUser.email,
           picture: newUser.picture,
           status: newUser.status,
-          access_token,
+          token: accessToken,
         }
     });
   } catch (error) {
@@ -52,18 +52,18 @@ export const postLogin = async (req, res, next) => {
   try {
     const { email, password } = req.body;
     const user = await signUser(email, password);
-    const access_token = await generateToken(
+    const accessToken = await generateToken(
         { userId: user._id },
         "1d",
         ACCESS_TOKEN_SECRET
       );
-      const refresh_token = await generateToken(
+      const refreshToken = await generateToken(
         { userId: user._id },
         "30d",
         REFRESH_TOKEN_SECRET
       );
   
-      res.cookie("refreshtoken", refresh_token, {
+      res.cookie("refreshtoken", refreshToken, {
           httpOnly: true,
           path: "/api/v1/auth/refreshtoken",
           maxAge: 30 * 24 * 40 * 60 * 1000 // 30 days
@@ -77,7 +77,7 @@ export const postLogin = async (req, res, next) => {
             email: user.email,
             picture: user.picture,
             status: user.status,
-            access_token,
+            token: accessToken,
           }
       });
   } catch (error) {
@@ -98,16 +98,16 @@ export const postLogout = async (req, res, next) => {
 
 export const postRefreshToken = async (req, res, next) => {
   try {
-    const refresh_token = req.cookies.refreshtoken;
+    const refreshToken = req.cookies.refreshtoken;
 
-    if (!refresh_token) throw createHttpError.Unauthorized("Please login.");
+    if (!refreshToken) throw createHttpError.Unauthorized("Please login.");
 
     const check = await verifyToken(
-      refresh_token,
+      refreshToken,
       REFRESH_TOKEN_SECRET
     );
     const user = await findUser(check.userId);
-    const access_token = await generateToken(
+    const accessToken = await generateToken(
       { userId: user._id },
       "1d",
       ACCESS_TOKEN_SECRET
@@ -119,7 +119,7 @@ export const postRefreshToken = async (req, res, next) => {
         email: user.email,
         picture: user.picture,
         status: user.status,
-        access_token,
+        token: accessToken,
       },
     });
   } catch (error) {
