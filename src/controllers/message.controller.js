@@ -1,39 +1,38 @@
-import logger from "../configs/logger.config.js";
-import { createMessage, populateMessage, updateLatestMessage, getConversationMessages } from "../services/message.service.js";
+import {
+  createMessage,
+  populateMessage,
+  updateLatestMessage,
+  getConversationMessages,
+} from "../services/message.service.js";
 
 export const postMessage = async (req, res, next) => {
-    try {
-        const userId = req.user.userId;
-        const { message, conversationId, files } = req.body;
-        if (!conversationId || (!message && !files)) {
-            logger.error("Invalid post message request");
-            return res.sendStatus(400);
-        }
-        const msgData = {
-            sender: userId,
-            message,
-            conversation: conversationId,
-            files: files || []
-        };
-        let newMessage = await createMessage(msgData);
-        let populatedMessage = await populateMessage(newMessage._id);
-        await updateLatestMessage(conversationId, newMessage);
-        res.json(populatedMessage);
-    } catch (error) {
-        next(error);
-    }
-}
+  try {
+    // Extract user id, conversationId, message, files; Create new message document; Populate new message field; Update conversation document latest message
+    const userId = req.user.userId;
+    const { message, conversationId, files } = req.body;
+
+    const messageData = {
+      sender: userId,
+      message,
+      conversation: conversationId,
+      files: files || [],
+    };
+    const newMessage = await createMessage(messageData);
+    const populatedMessage = await populateMessage(newMessage._id);
+    await updateLatestMessage(conversationId, newMessage);
+    res.json(populatedMessage);
+  } catch (error) {
+    next(error);
+  }
+};
 
 export const getMessages = async (req, res, next) => {
-    try {
-        const conversationId = req.params.conversationId;
-        if(!conversationId) {
-            logger.error("conversationId params is not found")
-            res.sendStatus(400);
-        }
-        const messages = await getConversationMessages(conversationId);
-        res.json(messages);
-    } catch (error) {
-        next(error);
-    }
-}
+  // Extract conversation id from the params; Passes it to getConversationMessages; Send the messages found back to client;
+  try {
+    const conversationId = req.params.conversationId;
+    const messagesFound = await getConversationMessages(conversationId);
+    res.json(messagesFound);
+  } catch (error) {
+    next(error);
+  }
+};

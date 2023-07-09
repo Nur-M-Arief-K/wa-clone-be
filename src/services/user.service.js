@@ -8,13 +8,17 @@ export const findUser = async (userId) => {
 };
 
 export const searchUsers = async (keyword, searcherUserId) => {
-  // Look for the users in the db based on user's name or email but not return the searcher user
-  const users = await UserModel.find({
-    _id: { $ne: searcherUserId },
-    $or: [
-      { name: { $regex: keyword, $options: "i" } },
-      { email: { $regex: keyword, $options: "i" } },
-    ],
-  })
-  return users;
+  try {
+    // Look for the users in the db based on user's name or email but not return the searcher user
+    const users = await UserModel.find({
+      _id: { $ne: searcherUserId },
+      $or: [
+        { name: { $regex: keyword, $options: "i" } },
+        { email: { $regex: keyword, $options: "i" } },
+      ],
+    })
+    return users;
+  } catch (error) {
+    throw createHttpError.BadGateway("Error search users")
+  }
 };

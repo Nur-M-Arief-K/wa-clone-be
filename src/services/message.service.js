@@ -1,60 +1,65 @@
-import createHttpError from "http-errors";
 import { ConversationModel, MessageModel } from "../models/index.js";
+import createHttpError from "http-errors";
 
-export const createMessage = async (data) => {
-  let newMessage = await MessageModel.create(data);
-  if (!newMessage) {
-    throw createHttpError.BadRequest("somehing went wrong");
+export const createMessage = async (messageData) => {
+  try {
+    const newMessage = await MessageModel.create(messageData);
+    return newMessage;
+  } catch (error) {
+    throw createHttpError.BadGateway("Error creating message document");
   }
-  return newMessage;
 };
 
-export const populateMessage = async (id) => {
-  let msg = await MessageModel.findById(id)
-    .populate({
-      path: "sender",
-      select: "name picture",
-      model: "UserModel",
-    })
-    .populate({
-      path: "conversation",
-      select: "name picture isGroup users",
-      model: "ConversationModel",
-      populate: {
-        path: "users",
-        select: "name email picture status",
+export const populateMessage = async (messageId) => {
+  try {
+    const message = await MessageModel.findById(messageId)
+      .populate({
+        path: "sender",
+        select: "name picture",
         model: "UserModel",
-      },
-    });
+      })
+      .populate({
+        path: "conversation",
+        select: "name picture isGroup users",
+        model: "ConversationModel",
+        populate: {
+          path: "users",
+          select: "name email picture status",
+          model: "UserModel",
+        },
+      });
 
-  if (!msg) {
-    throw createHttpError.BadRequest("something went wrong");
+    return message;
+  } catch (error) {
+    throw createHttpError.BadGateway("Error populate message document");
   }
-
-  return msg;
 };
 
-export const updateLatestMessage = async (conversation_id, msg) => {
-  const updatedConversation = await ConversationModel.findByIdAndUpdate(
-    conversation_id,
-    {
-      latestMessage: msg,
-    }
-  );
-
-  if (!updatedConversation) {
-    throw createHttpError.BadRequest("something went wrong");
+export const updateLatestMessage = async (conversation_id, message) => {
+  try {
+    const updatedConversation = await ConversationModel.findByIdAndUpdate(
+      conversation_id,
+      {
+        latestMessage: message,
+      }
+    );
+    return updatedConversation;
+  } catch (error) {
+    throw createHttpError.BadGateway(
+      "Failed to update conversation latest message"
+    );
   }
-
-  return updatedConversation;
 };
 
 export const getConversationMessages = async (conversationId) => {
-  const messages = await MessageModel.find({
-    conversation: conversationId,
-  }).populate({ path: "sender", select: "name picture email status" }).populate("conversation");
-  if(!messages) {
-    throw createHttpError.BadRequest("something went wrong")
+  try {
+    const messages = await MessageModel.find({
+      conversation: conversationId,
+    })
+      .populate({ path: "sender", select: "name picture email status" })
+      .populate("conversation");
+    return messages;
+  } catch (error) {
+    throw createHttpError.BadGateway("Error get conversation messages");
   }
-  return messages;
 };
