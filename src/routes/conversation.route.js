@@ -1,11 +1,23 @@
+/*----------IMPORT----------*/
 import express from "express";
+
+// Middlewares
 import trimRequest from "trim-request";
 import authMiddleware from "../middlewares/auth.middleware.js";
-import { postCreateOpenConversation, getConversations } from "../controllers/conversation.controller.js";
 
+// Controllers
+import {
+  postCreateOpenConversation,
+  getConversations,
+} from "../controllers/conversation.controller.js";
+
+/*----------ROUTE LOGIC----------*/
 const router = express.Router();
 
-router.post("/", trimRequest.all, authMiddleware, postCreateOpenConversation)
-router.get("/", trimRequest.all, authMiddleware, getConversations)
+// Route /conversation/
+router
+  .route("/")
+  .get(authMiddleware, trimRequest.all, getConversations)
+  .post(authMiddleware, trimRequest.all, postCreateOpenConversation);
 
 export default router;

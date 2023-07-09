@@ -7,14 +7,14 @@ export const findUser = async (userId) => {
   return user;
 };
 
-export const searchUsers = async (keyword, userId) => {
+export const searchUsers = async (keyword, searcherUserId) => {
+  // Look for the users in the db based on user's name or email but not return the searcher user
   const users = await UserModel.find({
+    _id: { $ne: searcherUserId },
     $or: [
       { name: { $regex: keyword, $options: "i" } },
       { email: { $regex: keyword, $options: "i" } },
     ],
-  }).find({
-    _id: { $ne: userId },
-  });
+  })
   return users;
 };

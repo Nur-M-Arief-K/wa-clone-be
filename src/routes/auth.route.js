@@ -1,5 +1,10 @@
+/*----------IMPORT----------*/
 import express from "express";
+
+// Middlewares
 import trimRequest from "trim-request";
+
+// Controllers
 import {
   postLogin,
   postLogout,
@@ -7,11 +12,19 @@ import {
   postRegister,
 } from "../controllers/auth.controller.js";
 
+/*----------ROUTE LOGIC----------*/
 const router = express.Router();
 
-router.post("/register", [trimRequest.all], postRegister);
-router.post("/login", [trimRequest.all], postLogin);
-router.post("/logout", [trimRequest.all], postLogout);
-router.post("/refreshToken", [trimRequest.all], postRefreshToken);
+// Route /auth/register/
+router.route("/register").post(trimRequest.all, postRegister);
+
+// Route /auth/login/
+router.route("/login").post(trimRequest.all, postLogin);
+
+// Route /auth/logout/
+router.route("/logout").post(trimRequest.all, postLogout);
+
+// Route /auth/refreshToken/
+router.route("/refreshToken").post(trimRequest.all, postRefreshToken);
 
 export default router;
