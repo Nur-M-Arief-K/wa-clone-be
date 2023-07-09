@@ -1,6 +1,11 @@
 import createHttpError from 'http-errors';
 import logger from '../configs/logger.config.js';
-import validationResult from '../utils/express-validator/validation-result.js';
+import { validationResult as expressValidatorValidationResult } from "express-validator";
+
+// only print msg property from express-validator validationResult error object
+const validationResult = expressValidatorValidationResult.withDefaults({
+  formatter: (error) => error.msg,
+});
 
 const HTTPRequestValidator = (req, res, next) => {
     try {
