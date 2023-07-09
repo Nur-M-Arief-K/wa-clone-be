@@ -1,25 +1,19 @@
-import createHttpError from "http-errors";
-import logger from "../configs/logger.config.js";
-import { doesConversationExist, createConversation, populateConversation, getUserConversations } from "../services/conversation.service.js";
+import { searchConversations, createConversation, populateConversation, getUserConversations } from "../services/conversation.service.js";
 import { findUser } from "../services/user.service.js";
 
 export const postCreateOpenConversation = async (req, res, next) => {
     try {
         const senderId = req.user.userId;
         const { receiverId } = req.body;
-        if(!receiverId) {
-            logger.error("please provide the receiver user id");
-            throw createHttpError.BadRequest("something went wrong");
-        }
-        const conversationExist = await doesConversationExist(senderId, receiverId);
+        const conversation = await searchConversations(senderId, receiverId);
 
-        if(conversationExist) {
-            res.json(conversationExist);
+        if(conversation) {
+            res.json(conversation);
         } else {
-            let receiver_user = await findUser(receiverId);
-            let conversationData = {
-                name: receiver_user.name,
-                picture: receiver_user.picture,
+            const receiverUser = await findUser(receiverId);
+            const conversationData = {
+                name: receiverUser.name,
+                picture: receiverUser.picture,
                 isGroup: false,
                 users: [senderId, receiverId]
             };
@@ -34,10 +28,10 @@ export const postCreateOpenConversation = async (req, res, next) => {
 
 export const getConversations = async (req, res, next) => {
     try {
-        const user_id = req.user.userId;
-        const conversations = await getUserConversations(user_id);
-        res.status(200).json(conversations);
+        const userId = req.user.userId;
+        const conversationsFound = await getUserConversations(userId);
+        res.status(200).json(conversationsFound);
     } catch (error) {
-        
+        next(error);
     }
 }

@@ -29,6 +29,12 @@ export const populateMessage = async (messageId) => {
         },
       });
 
+    if (!message) {
+      throw createHttpError.BadRequest(
+        "Cannot find message document related to the messageId"
+      );
+    }
+
     return message;
   } catch (error) {
     throw createHttpError.BadGateway("Error populate message document");
@@ -58,6 +64,8 @@ export const getConversationMessages = async (conversationId) => {
     })
       .populate({ path: "sender", select: "name picture email status" })
       .populate("conversation");
+
+    // It's okay to return empty array
     return messages;
   } catch (error) {
     throw createHttpError.BadGateway("Error get conversation messages");

@@ -4,6 +4,7 @@ import express from "express";
 // Middlewares
 import trimRequest from "trim-request";
 import authMiddleware from "../middlewares/auth.middleware.js";
+import { body } from "express-validator";
 
 // Controllers
 import {
@@ -18,6 +19,18 @@ const router = express.Router();
 router
   .route("/")
   .get(authMiddleware, trimRequest.all, getConversations)
-  .post(authMiddleware, trimRequest.all, postCreateOpenConversation);
+  /// receive body: receiverId
+  .post(
+    authMiddleware,
+    trimRequest.all,
+    [
+      body("receiverId")
+        .exists({ values: "falsy" })
+        .withMessage(
+          "receiverId in req body must be passed and cannot be an empty string"
+        ),
+    ],
+    postCreateOpenConversation
+  );
 
 export default router;
