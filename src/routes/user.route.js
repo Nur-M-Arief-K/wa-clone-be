@@ -14,7 +14,7 @@ import { getSearchUsers } from "../controllers/user.controller.js";
 const router = express.Router();
 
 // Route /user/
-/// Receive { query: ["search"] }
+/// Receive query: search!
 router
   .route("/")
   .get(

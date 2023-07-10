@@ -1,6 +1,6 @@
 import { createUser } from "../services/auth.service.js";
 import { generateToken, verifyToken } from "../services/token.service.js";
-import { signUser } from "../services/auth.service.js";
+import { signInUser  } from "../services/auth.service.js";
 import { findUser } from "../services/user.service.js";
 
 const { ACCESS_TOKEN_SECRET, REFRESH_TOKEN_SECRET } = process.env;
@@ -51,7 +51,7 @@ export const postRegister = async (req, res, next) => {
 export const postLogin = async (req, res, next) => {
   try {
     const { email, password } = req.body;
-    const user = await signUser(email, password);
+    const user = await signInUser(email, password);
     const accessToken = await generateToken(
         { userId: user._id },
         "1d",
@@ -99,8 +99,6 @@ export const postLogout = async (req, res, next) => {
 export const postRefreshToken = async (req, res, next) => {
   try {
     const refreshToken = req.cookies.refreshtoken;
-
-    if (!refreshToken) throw createHttpError.Unauthorized("Please login.");
 
     const check = await verifyToken(
       refreshToken,

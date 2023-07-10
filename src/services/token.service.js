@@ -1,11 +1,20 @@
+import createHttpError from "http-errors";
 import { sign, verify } from "../utils/token.util.js";
 
 export const generateToken = async (payload, expiresIn, secret) => {
-  let token = await sign(payload, expiresIn, secret);
-  return token;
+  try {
+    const token = await sign(payload, expiresIn, secret);
+    return token;
+  } catch (error) {
+    throw createHttpError.BadGateway("Cannot generate token");
+  }
 };
 
 export const verifyToken = async (token, secret) => {
-  let check = await verify(token, secret);
-  return check;
+  try {
+    const check = await verify(token, secret);
+    return check;
+  } catch (error) {
+    throw createHttpError.BadGateway("Cannot verify token");
+  }
 };

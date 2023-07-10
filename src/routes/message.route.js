@@ -14,7 +14,7 @@ import { postMessage, getMessages } from "../controllers/message.controller.js";
 const router = express.Router();
 
 // Route /message/
-/// receive body: conversationId, message, files
+/// receive body: conversationId!, message, files
 router
   .route("/")
   .post(
@@ -39,7 +39,7 @@ router
   );
 
 // Route /message/:conversationId
-/// receive params conversationId
+/// receive params conversationId!
 router
   .route("/:conversationId")
   .get(authMiddleware, trimRequest.param, getMessages);

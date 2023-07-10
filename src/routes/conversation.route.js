@@ -5,6 +5,7 @@ import express from "express";
 import trimRequest from "trim-request";
 import authMiddleware from "../middlewares/auth.middleware.js";
 import { body } from "express-validator";
+import HTTPRequestValidator from "../middlewares/HTTPRequestValidator.middleware.js";
 
 // Controllers
 import {
@@ -19,10 +20,10 @@ const router = express.Router();
 router
   .route("/")
   .get(authMiddleware, trimRequest.all, getConversations)
-  /// receive body: receiverId
+  /// receive body: receiverId!
   .post(
     authMiddleware,
-    trimRequest.all,
+    trimRequest.body,
     [
       body("receiverId")
         .exists({ values: "falsy" })
@@ -30,6 +31,7 @@ router
           "receiverId in req body must be passed and cannot be an empty string"
         ),
     ],
+    HTTPRequestValidator,
     postCreateOpenConversation
   );
 
