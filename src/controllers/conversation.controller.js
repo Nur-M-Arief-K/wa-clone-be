@@ -10,10 +10,9 @@ export const postCreateOpenConversation = async (req, res, next) => {
         if(conversation) {
             res.json(conversation);
         } else {
-            const receiverUser = await findUser(receiverId);
             const conversationData = {
-                name: receiverUser.name,
-                picture: receiverUser.picture,
+                name: "conversation name",
+                picture: "conversation picture",
                 isGroup: false,
                 users: [senderId, receiverId]
             };
