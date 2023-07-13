@@ -18,7 +18,8 @@ export const createUser = async (userData) => {
     }
 
     // Hashing user password is done in user schema when its pre-saved
-    // Adding user to databse
+
+    // Adding user to database
     const user = await new UserModel({
       name,
       email,
@@ -29,6 +30,10 @@ export const createUser = async (userData) => {
 
     return user;
   } catch (error) {
+    if (+error.status < 500) {
+      throw error;
+    }
+
     throw createHttpError.BadGateway("Cannot create user, error in the db");
   }
 };
@@ -36,20 +41,21 @@ export const createUser = async (userData) => {
 export const signInUser = async (email, password) => {
   try {
     const user = await UserModel.findOne({ email: email.toLowerCase() }).lean();
-
-    //check if user exist
     if (!user) {
       throw createHttpError.NotFound("Invalid credentials.");
     }
 
-    //compare passwords
-    let passwordMatches = await bcrypt.compare(password, user.password);
-
-    if (!passwordMatches)
+    const isPasswordMatch = await bcrypt.compare(password, user.password);
+    if (!isPasswordMatch) {
       throw createHttpError.NotFound("Invalid credentials.");
+    }
 
     return user;
   } catch (error) {
-    throw createHttpError.BadGateway("Cannot sign in user, error in the db");
+    if (+error.status < 500) {
+      throw error;
+    }
+    
+    throw createHttpError.BadGateway("Cannot sign in user, error in the db, please try again later");
   }
 };
