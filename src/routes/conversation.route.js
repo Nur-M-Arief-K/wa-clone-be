@@ -11,6 +11,7 @@ import HTTPRequestValidator from "../middlewares/HTTPRequestValidator.middleware
 import {
   postCreateOpenConversation,
   getConversations,
+  postCreateGroup,
 } from "../controllers/conversation.controller.js";
 
 /*----------ROUTE LOGIC----------*/
@@ -33,6 +34,28 @@ router
     ],
     HTTPRequestValidator,
     postCreateOpenConversation
+  );
+
+// Route /conversation/group
+router
+  .route("/group")
+  .post(
+    authMiddleware,
+    trimRequest.body,
+    [
+      body("name")
+        .exists({ values: "falsy" })
+        .withMessage(
+          "name in req body must be passed and cannot be an empty string"
+        ),
+      body("users")
+        .exists({ values: "falsy" })
+        .withMessage(
+          "users in req body must be passed and cannot be an empty string"
+        ),
+    ],
+    HTTPRequestValidator,
+    postCreateGroup
   );
 
 export default router;

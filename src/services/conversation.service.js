@@ -4,25 +4,42 @@ import createHttpError from "http-errors";
 
 const ObjectId = mongoose.Types.ObjectId;
 
-export const searchConversations = async (senderId, receiverId) => {
+export const searchConversations = async (senderId, receiverId, isGroup) => {
   try {
-    const conversations = await ConversationModel.find({
-      isGroup: false,
-      users: {
-        $all: [new ObjectId(senderId), new ObjectId(receiverId)],
-      },
-    })
-      .populate("users", "-password")
-      .populate("latestMessage");
+    if (isGroup === false) {
+      const conversations = await ConversationModel.find({
+        isGroup: false,
+        users: {
+          $all: [new ObjectId(senderId), new ObjectId(receiverId)],
+        },
+      })
+        .populate("users", "-password")
+        .populate("latestMessage");
 
-    // It's okay to return empty array
+      // It's okay to return empty array
 
-    const populatedConversations = await UserModel.populate(conversations, {
-      path: "latestMessage.sender",
-      select: "name email picture status",
-    });
+      const populatedConversations = await UserModel.populate(conversations, {
+        path: "latestMessage.sender",
+        select: "name email picture status",
+      });
 
-    return populatedConversations[0];
+      return populatedConversations[0];
+    } else {
+      const conversations = await ConversationModel.find({
+        _id: new ObjectId(isGroup),
+      })
+        .populate("users admin", "-password")
+        .populate("latestMessage");
+
+      // It's okay to return empty array
+
+      const populatedConversations = await UserModel.populate(conversations, {
+        path: "latestMessage.sender",
+        select: "name email picture status",
+      });
+
+      return populatedConversations[0];
+    }
   } catch (error) {
     throw createHttpError.BadGateway(
       "Something went wrong, cannot find conversations"
@@ -49,8 +66,10 @@ export const populateConversation = async (
       _id: conversationId,
     }).populate(fieldsToPopulate, fieldsToRemove);
 
-    if(!populateConversation) {
-      throw createHttpError.BadRequest("No conversation document is find related to the conversationId")
+    if (!populateConversation) {
+      throw createHttpError.BadRequest(
+        "No conversation document is find related to the conversationId"
+      );
     }
 
     return populatedConversation;
@@ -70,7 +89,7 @@ export const getUserConversations = async (userId) => {
       .populate("latestMessage")
       .sort({ updatedAt: -1 });
 
-      // It's okay to return empty array
+    // It's okay to return empty array
 
     const populatedConversationsFound = await UserModel.populate(
       conversationsFound,
